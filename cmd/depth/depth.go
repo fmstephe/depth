@@ -118,36 +118,19 @@ func writePkgJSON(w io.Writer, p depth.Pkg) {
 func writePkg(w io.Writer, p depth.Pkg) {
 	fmt.Fprintf(w, "%s\n", p.String())
 
-	for idx, d := range p.Deps {
-		writePkgRec(w, d, []bool{true}, idx == len(p.Deps)-1)
+	for _, d := range p.Deps {
+		writePkgRec(w, d, []string{})
 	}
 }
 
 // writePkg recursively prints a Pkg and its dependencies to the Writer provided.
-func writePkgRec(w io.Writer, p depth.Pkg, closed []bool, isLast bool) {
-	var prefix string
-
-	for _, c := range closed {
-		if c {
-			prefix += outputClosedPadding
-			continue
-		}
-
-		prefix += outputOpenPadding
+func writePkgRec(w io.Writer, p depth.Pkg, path []string) {
+	path = append(path, p.Name)
+	if len(p.Deps) == 0 {
+		fmt.Fprintf(w, strings.Join(path, ":")+"\n")
 	}
-
-	closed = append(closed, false)
-	if isLast {
-		prefix += outputPrefixLast
-		closed[len(closed)-1] = true
-	} else {
-		prefix += outputPrefix
-	}
-
-	fmt.Fprintf(w, "%v%v\n", prefix, p.String())
-
-	for idx, d := range p.Deps {
-		writePkgRec(w, d, closed, idx == len(p.Deps)-1)
+	for _, d := range p.Deps {
+		writePkgRec(w, d, path)
 	}
 }
 

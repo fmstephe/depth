@@ -126,9 +126,7 @@ func writePkg(w io.Writer, p depth.Pkg) {
 // writePkg recursively prints a Pkg and its dependencies to the Writer provided.
 func writePkgRec(w io.Writer, p depth.Pkg, path []string) {
 	path = append(path, p.Name)
-	if len(p.Deps) == 0 {
-		fmt.Fprintf(w, strings.Join(path, ":")+"\n")
-	}
+	fmt.Fprintf(w, strings.Join(path, ":")+"\n")
 	for _, d := range p.Deps {
 		writePkgRec(w, d, path)
 	}
